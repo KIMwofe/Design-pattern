@@ -1,0 +1,140 @@
+<!--
+ * @Author: wjl
+ * @Date: 2021-12-21 10:03:26
+ * @LastEditors: wjl
+ * @LastEditTime: 2021-12-21 11:07:08
+ * @FilePath: \sheji\sehjimoshi.html
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+  <!-- <script>
+
+
+    //观察者模式框架
+    var msgCenter = (function () {
+      var _msg = {} //存储消息
+      return {
+        //用于订阅一个消息
+        register: function (type, fn) { // type: 消息类型, fn: 当消息中心发布这一条消息的时候执行的回调
+
+        },
+        //用于发布消息
+        fire: function (type, args) {// type: 指定发送什么类型的消息, args: 当发布消息所附带的一些信息
+
+        },
+        //取消订阅消息
+        cancle: function (type, fn) {// type: 取消哪一个类型的消息订阅, fn: 取消这个类型下面的哪一个回调
+
+        }
+      }
+    })()
+
+
+  </script> -->
+
+  <script>
+
+
+    //观察者模式框架
+    var msgCenter = (function () {
+      var _msg = {} //存储消息
+      /*
+        var _msg = {
+          carInfo: [person1.alreadyRegister.carInfo, person1.alreadyRegister.carInfo]
+          newsInfo: [person1.alreadyRegister.newsInfo, person3.alreadyRegister.newsInfo]
+        }
+      */
+      return {
+        //用于订阅一个消息
+        register: function (type, fn) { // type: 消息类型, fn: 当消息中心发布这一条消息的时候执行的回调
+          if (_msg[type]) {
+            _msg[type].push(fn)
+          } else {
+            _msg[type] = [fn]
+          }
+        },
+        //用于发布消息
+        fire: function (type, args) {// type: 指定发送什么类型的消息, args: 当发布消息所附带的一些信息
+          if (!_msg[type]) return
+          var msg = {
+            type,
+            args: args || ''
+          }
+          for (let i = 0; i < _msg[type].length; i++) {
+            _msg[type][i](msg)
+          }
+        },
+        //取消订阅消息
+        cancle: function (type, fn) {// type: 取消哪一个类型的消息订阅, fn: 取消这个类型下面的哪一个回调
+          if (_msg[type]) return
+          for (let i = 0; i < _msg[type].length; i++) {
+            if (_msg[type][i] === fn) {
+              _msg[type].splice(i, 1)
+              break;
+            }
+          }
+        }
+      }
+    })()
+
+
+  </script>
+
+  <script>
+
+    function Person() {
+      this.alreadyRegister = {}
+    }
+
+    Person.prototype.register = function (type, fn) {
+      if (this.alreadyRegister[type]) {
+        alert('您已经订阅过这个消息了，请不要重复订阅')
+      } else {
+        msgCenter.register(type, fn)
+        this.alreadyRegister[type] = fn
+      }
+
+    }
+
+    Person.prototype.cancle = function (type, fn) {
+      msgCenter.cancle(type, this.alreadyRegister[type])
+      delete this.alreadyRegister[type]
+    }
+
+    var person1 = new Person()
+    var person2 = new Person()
+    var person3 = new Person()
+
+    person1.register('carInfo', function (e) {
+      console.log('person1得到了关于' + e.type + '的消息， 消息内容是' + e.args.info)
+    })
+
+    person1.register('newsInfo', function (e) {
+      console.log('person1得到了关于' + e.type + '的消息， 消息内容是' + e.args.info)
+    })
+
+    person2.register('carInfo', function (e) {
+      console.log('person2得到了关于' + e.type + '的消息， 消息内容是' + e.args.info)
+    })
+
+    person3.register('newsInfo', function (e) {
+      console.log('person3得到了关于' + e.type + '的消息， 消息内容是' + e.args.info)
+    })
+
+
+    msgCenter.fire('carInfo', { info: '新款汽车上市' })
+  </script>
+
+
+</body>
+
+</html>
