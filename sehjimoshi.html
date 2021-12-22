@@ -2,7 +2,7 @@
  * @Author: wjl
  * @Date: 2021-12-21 10:03:26
  * @LastEditors: wjl
- * @LastEditTime: 2021-12-21 11:07:08
+ * @LastEditTime: 2021-12-22 14:15:46
  * @FilePath: \sheji\sehjimoshi.html
 -->
 <!DOCTYPE html>
@@ -13,9 +13,65 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
+  <style>
+    .msgBox {
+      width: 1200px;
+      margin: 0 auto;
+    }
+
+    .person {
+      display: flex;
+      align-items: center;
+      margin: 20px;
+    }
+
+    .person button {
+      margin: 0 20px;
+    }
+
+    .msgSend {
+      margin: 0 auto;
+      margin-top: 120px;
+      display: flex;
+      width: 1200px;
+
+    }
+  </style>
 </head>
 
 <body>
+  <div class="msgBox">
+    <div class="person person1">
+      <span>Person1:</span>
+      <button onclick="personNewsInfo('person1')">订阅新闻消息</button>
+      <button onclick="personCarinfo('person1')">订阅新车消息</button>
+      <span></span>
+    </div>
+    <div class="person person2">
+      <span>Person2:</span>
+      <button onclick="personNewsInfo('person2')">订阅新闻消息</button>
+      <button onclick="personCarinfo('person2')">订阅新车消息</button>
+      <span></span>
+    </div>
+    <div class="person person3">
+      <span>Person3:</span>
+      <button onclick="personNewsInfo('person3')">订阅新闻消息</button>
+      <button onclick="personCarinfo('person3')">订阅新车消息</button>
+      <span></span>
+    </div>
+  </div>
+  <div class="msgSend">
+    <div class="person">
+      <button onclick="newsMsgSend()">新闻消息发布</button>
+      <textarea placeholder="消息内容" name="" id="newsText" cols="30" rows="10"></textarea>
+      <span></span>
+    </div>
+    <div class="person">
+      <button onclick="carMsgSend()">新车消息发布</button>
+      <textarea placeholder="消息内容" name="" id="carText" cols="30" rows="10"></textarea>
+      <span></span>
+    </div>
+  </div>
   <!-- <script>
 
 
@@ -99,6 +155,7 @@
       if (this.alreadyRegister[type]) {
         alert('您已经订阅过这个消息了，请不要重复订阅')
       } else {
+        alert('订阅成功')
         msgCenter.register(type, fn)
         this.alreadyRegister[type] = fn
       }
@@ -134,6 +191,83 @@
     msgCenter.fire('carInfo', { info: '新款汽车上市' })
   </script>
 
+
+  <script>
+    var personObj = {
+      person1,
+      person2,
+      person3
+    }
+
+    function personCarinfo(person) {
+      personObj[person].register('carInfo', function (e) {
+        document.getElementsByClassName(person)[0].getElementsByTagName('span')[1].innerText = document.getElementsByClassName(person)[0].getElementsByTagName('span')[1].innerText + `  ${person}得到了关于' + e.type + '的消息， 消息内容是` + e.args.info
+      })
+    }
+
+    function personNewsInfo(person) {
+      personObj[person].register('newsInfo', function (e) {
+        document.getElementsByClassName(person)[0].getElementsByTagName('span')[1].innerText = document.getElementsByClassName(person)[0].getElementsByTagName('span')[1].innerText + `  ${person}得到了关于` + e.type + '的消息， 消息内容是' + e.args.info
+      })
+    }
+
+    function carMsgSend() {
+      msgCenter.fire('carInfo', { info: document.getElementById('carText').value })
+    }
+
+    function newsMsgSend() {
+      msgCenter.fire('newsInfo', { info: document.getElementById('newsText').value })
+    }
+
+  </script>
+
+  <script>
+    //列表迭代器
+    function arrayiterator(list, fn) {
+      let i = 0, len = list.length;
+      for (i; i < len; i++) {
+        fn.call(null, list[i], i)
+      }
+    }
+    arrayiterator([1, 2, 3, 4], (value, index) => {
+      console.log(value, index)
+    })
+
+    //对象迭代器
+    function objectiterator(obj, fn) {
+      for (let i in obj) {
+        fn.call(null, obj[i], i)
+      }
+    }
+    objectiterator({ "a": 'aaa', "b": 'bbb' }, (value, index) => {
+      console.log(value, index)
+    })
+
+
+    //通用型迭代器
+    function iterator(obj, fn) {
+      if (Object.prototype.toString.call(obj) === "[object Array]") {
+        for (let i = 0; i < obj.length; i++) {
+          fn.call(null, obj[i], i)
+        }
+      } else if (Object.prototype.toString.call(obj) === '[object Object]') {
+        for (let i in obj) {
+          fn.call(null, obj[i], i)
+        }
+      } else {
+        throw new Error('请传入一个数组或对象')
+      }
+    }
+    // iterator([3, 6, 9], function (val, index) {
+    //   console.log(val, index)
+    // })
+    // iterator({
+    //   'a': 'aaa',
+    //   'b': 'bbb'
+    // }, function (val, key) {
+    //   console.log(val, key)
+    // })
+  </script>
 
 </body>
 
