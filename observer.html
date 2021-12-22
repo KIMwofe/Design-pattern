@@ -2,7 +2,7 @@
  * @Author: wjl
  * @Date: 2021-12-22 14:17:10
  * @LastEditors: wjl
- * @LastEditTime: 2021-12-22 14:18:16
+ * @LastEditTime: 2021-12-22 14:51:42
  * @FilePath: \sheji\observer.html
 -->
 <!DOCTYPE html>
@@ -47,6 +47,7 @@
         <span>Person1:</span>
         <button onclick="personNewsInfo('person1')">订阅新闻消息</button>
         <button onclick="personCarinfo('person1')">订阅新车消息</button>
+        <button onclick="personCancal('person1', 'newsInfo')">取消订阅新闻消息</button>
         <span></span>
       </div>
       <div class="person person2">
@@ -109,8 +110,9 @@
           },
           //取消订阅消息
           cancle: function (type, fn) {// type: 取消哪一个类型的消息订阅, fn: 取消这个类型下面的哪一个回调
-            if (_msg[type]) return
+            if (!_msg[type]) return
             for (let i = 0; i < _msg[type].length; i++) {
+              console.log(_msg[type][i], fn)
               if (_msg[type][i] === fn) {
                 _msg[type].splice(i, 1)
                 break;
@@ -141,6 +143,7 @@
       Person.prototype.cancle = function (type, fn) {
         msgCenter.cancle(type, this.alreadyRegister[type])
         delete this.alreadyRegister[type]
+
       }
 
 
@@ -160,7 +163,7 @@
 
       function personCarinfo(person) {
         personObj[person].register('carInfo', function (e) {
-          document.getElementsByClassName(person)[0].getElementsByTagName('span')[1].innerText = document.getElementsByClassName(person)[0].getElementsByTagName('span')[1].innerText + `  ${person}得到了关于' + e.type + '的消息， 消息内容是` + e.args.info
+          document.getElementsByClassName(person)[0].getElementsByTagName('span')[1].innerText = document.getElementsByClassName(person)[0].getElementsByTagName('span')[1].innerText + `  ${person}得到了关于` + e.type + '的消息， 消息内容是' + e.args.info
         })
       }
 
@@ -168,6 +171,10 @@
         personObj[person].register('newsInfo', function (e) {
           document.getElementsByClassName(person)[0].getElementsByTagName('span')[1].innerText = document.getElementsByClassName(person)[0].getElementsByTagName('span')[1].innerText + `  ${person}得到了关于` + e.type + '的消息， 消息内容是' + e.args.info
         })
+      }
+
+      function personCancal(person, type) {
+        personObj[person].cancle(type)
       }
 
       function carMsgSend() {
