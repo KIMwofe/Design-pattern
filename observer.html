@@ -125,6 +125,8 @@
         this.alreadyRegister = {}
       }
 
+
+
       Person.prototype.register = function (type, fn) {
         if (this.alreadyRegister[type]) {
           alert('您已经订阅过这个消息了，请不要重复订阅')
@@ -141,6 +143,10 @@
         delete this.alreadyRegister[type]
       }
 
+
+      var person1 = new Person()
+      var person2 = new Person()
+      var person3 = new Person()
 
 
     </script>
