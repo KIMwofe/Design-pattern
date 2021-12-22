@@ -1,0 +1,178 @@
+<!--
+ * @Author: wjl
+ * @Date: 2021-12-22 14:17:10
+ * @LastEditors: wjl
+ * @LastEditTime: 2021-12-22 14:18:16
+ * @FilePath: \sheji\observer.html
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    .msgBox {
+      width: 1200px;
+      margin: 0 auto;
+    }
+
+    .person {
+      display: flex;
+      align-items: center;
+      margin: 20px;
+    }
+
+    .person button {
+      margin: 0 20px;
+    }
+
+    .msgSend {
+      margin: 0 auto;
+      margin-top: 120px;
+      display: flex;
+      width: 1200px;
+
+    }
+  </style>
+</head>
+
+<body>
+
+  <body>
+    <div class="msgBox">
+      <div class="person person1">
+        <span>Person1:</span>
+        <button onclick="personNewsInfo('person1')">订阅新闻消息</button>
+        <button onclick="personCarinfo('person1')">订阅新车消息</button>
+        <span></span>
+      </div>
+      <div class="person person2">
+        <span>Person2:</span>
+        <button onclick="personNewsInfo('person2')">订阅新闻消息</button>
+        <button onclick="personCarinfo('person2')">订阅新车消息</button>
+        <span></span>
+      </div>
+      <div class="person person3">
+        <span>Person3:</span>
+        <button onclick="personNewsInfo('person3')">订阅新闻消息</button>
+        <button onclick="personCarinfo('person3')">订阅新车消息</button>
+        <span></span>
+      </div>
+    </div>
+    <div class="msgSend">
+      <div class="person">
+        <button onclick="newsMsgSend()">新闻消息发布</button>
+        <textarea placeholder="消息内容" name="" id="newsText" cols="30" rows="10"></textarea>
+        <span></span>
+      </div>
+      <div class="person">
+        <button onclick="carMsgSend()">新车消息发布</button>
+        <textarea placeholder="消息内容" name="" id="carText" cols="30" rows="10"></textarea>
+        <span></span>
+      </div>
+    </div>
+
+    <script>
+
+
+      //观察者模式框架
+      var msgCenter = (function () {
+        var _msg = {} //存储消息
+        /*
+          var _msg = {
+            carInfo: [person1.alreadyRegister.carInfo, person1.alreadyRegister.carInfo]
+            newsInfo: [person1.alreadyRegister.newsInfo, person3.alreadyRegister.newsInfo]
+          }
+        */
+        return {
+          //用于订阅一个消息
+          register: function (type, fn) { // type: 消息类型, fn: 当消息中心发布这一条消息的时候执行的回调
+            if (_msg[type]) {
+              _msg[type].push(fn)
+            } else {
+              _msg[type] = [fn]
+            }
+          },
+          //用于发布消息
+          fire: function (type, args) {// type: 指定发送什么类型的消息, args: 当发布消息所附带的一些信息
+            if (!_msg[type]) return
+            var msg = {
+              type,
+              args: args || ''
+            }
+            for (let i = 0; i < _msg[type].length; i++) {
+              _msg[type][i](msg)
+            }
+          },
+          //取消订阅消息
+          cancle: function (type, fn) {// type: 取消哪一个类型的消息订阅, fn: 取消这个类型下面的哪一个回调
+            if (_msg[type]) return
+            for (let i = 0; i < _msg[type].length; i++) {
+              if (_msg[type][i] === fn) {
+                _msg[type].splice(i, 1)
+                break;
+              }
+            }
+          }
+        }
+      })()
+
+
+      function Person() {
+        this.alreadyRegister = {}
+      }
+
+      Person.prototype.register = function (type, fn) {
+        if (this.alreadyRegister[type]) {
+          alert('您已经订阅过这个消息了，请不要重复订阅')
+        } else {
+          alert('订阅成功')
+          msgCenter.register(type, fn)
+          this.alreadyRegister[type] = fn
+        }
+
+      }
+
+      Person.prototype.cancle = function (type, fn) {
+        msgCenter.cancle(type, this.alreadyRegister[type])
+        delete this.alreadyRegister[type]
+      }
+
+
+
+    </script>
+
+    <script>
+      var personObj = {
+        person1,
+        person2,
+        person3
+      }
+
+      function personCarinfo(person) {
+        personObj[person].register('carInfo', function (e) {
+          document.getElementsByClassName(person)[0].getElementsByTagName('span')[1].innerText = document.getElementsByClassName(person)[0].getElementsByTagName('span')[1].innerText + `  ${person}得到了关于' + e.type + '的消息， 消息内容是` + e.args.info
+        })
+      }
+
+      function personNewsInfo(person) {
+        personObj[person].register('newsInfo', function (e) {
+          document.getElementsByClassName(person)[0].getElementsByTagName('span')[1].innerText = document.getElementsByClassName(person)[0].getElementsByTagName('span')[1].innerText + `  ${person}得到了关于` + e.type + '的消息， 消息内容是' + e.args.info
+        })
+      }
+
+      function carMsgSend() {
+        msgCenter.fire('carInfo', { info: document.getElementById('carText').value })
+      }
+
+      function newsMsgSend() {
+        msgCenter.fire('newsInfo', { info: document.getElementById('newsText').value })
+      }
+
+    </script>
+  </body>
+
+</html>
